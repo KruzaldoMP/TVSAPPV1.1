@@ -9,20 +9,19 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      - name: Build the APK with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
-        with:
-          command: buildozer android debug
-          buildozer_version: stable
+      - name: Build the APK with the official Buildozer Docker image
+        run: |
+          docker run --rm \
+            --volume "${{ github.workspace }}":/home/user/hostcwd \
+            ghcr.io/kivy/buildozer:latest android debug
 
       - name: Upload APK as a build artifact
         uses: actions/upload-artifact@v4
         with:
           name: tvs-unit-tracker-apk
-          path: ${{ steps.buildozer.outputs.filename }}
+          path: bin/*.apk
